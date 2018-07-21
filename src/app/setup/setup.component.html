@@ -1,0 +1,16 @@
+<form>
+  <fieldset class="card">
+    <h3 class="card-header">Encryption Keys</h3>
+    <div class="card-body">
+      <div class="form-group mb-3">
+        <label for="file-private">Private Key</label>
+        <div class="input-group">
+            <input type="password" class="form-control" name="master" #masterPassword>
+          <div class="input-group-append">
+              <button type="button" class="btn btn-primary" (click)="Generate()">Generate Key</button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </fieldset>
+</form>

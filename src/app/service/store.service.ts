@@ -9,7 +9,6 @@ import { Observable } from 'rxjs';
 export class StoreService {
 
   constructor(private fireStore: AngularFirestore) {
-
   }
 
   public Get<T>(collection: string): AngularFirestoreCollection<T> {

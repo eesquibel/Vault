@@ -39,6 +39,7 @@
     "@types/jasmine": "~2.8.6",
     "@types/jasminewd2": "~2.0.3",
     "@types/node": "~8.9.4",
+    "@types/text-encoding": "0.0.33",
     "codelyzer": "~4.2.1",
     "jasmine-core": "~2.99.1",
     "jasmine-spec-reporter": "~4.2.1",
