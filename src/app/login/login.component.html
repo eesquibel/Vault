@@ -1,0 +1,2 @@
+<button type="button" class="btn btn-primary" *ngIf="! auth.isLoggedIn" (click)="auth.signin()">Login</button>
+<button type="button" class="btn btn-light" *ngIf="auth.isLoggedIn" (click)="auth.signout()">Logout</button>
