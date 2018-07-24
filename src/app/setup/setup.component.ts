@@ -16,9 +16,19 @@ export class SetupComponent implements OnInit {
   @ViewChild('masterPassword')
   public masterPassword: ElementRef;
 
-  constructor(private route: Router, private crypto: CryptoService) { }
+  public hasKeys = true;
+  public loggedIn = false;
 
-  ngOnInit() {
+  constructor(private route: Router, private crypto: CryptoService, private auth: AuthenticationService) { }
+
+  async ngOnInit() {
+    this.crypto.ready.then(async ready => {
+     this.hasKeys = await this.crypto.HasKeys();
+    });
+
+    this.auth.user.subscribe(user => {
+      this.loggedIn = this.auth.isLoggedIn;
+    });
   }
 
   public Generate() {
@@ -26,7 +36,15 @@ export class SetupComponent implements OnInit {
     const password = this.masterPassword.nativeElement.value;
     const masterBytes = enc.encode(password);
 
-    this.crypto.GenerateKey(masterBytes);
+    this.crypto.GenerateKey(masterBytes).then(() => {
+      this.route.navigate(['credential']);
+    });
+  }
+
+  public Login() {
+    this.crypto.SetMaster(this.masterPassword.nativeElement.value).then(() => {
+      this.route.navigate(['credential']);
+    });
   }
 
 }

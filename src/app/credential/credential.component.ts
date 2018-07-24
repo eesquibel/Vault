@@ -1,5 +1,6 @@
 import { Component, OnInit } from '@angular/core';
 import { Router } from '@angular/router';
+import { CryptoService } from '../service/crypto.service';
 
 @Component({
   selector: 'app-credential',
@@ -8,10 +9,12 @@ import { Router } from '@angular/router';
 })
 export class CredentialComponent implements OnInit {
 
-  constructor(private route: Router) {
-    if (!localStorage.getItem('private-key')) {
-      route.navigate(['setup']);
-    }
+  constructor(private crypto: CryptoService, private route: Router) {
+    crypto.ready.then(ready => {
+      if (ready === false) {
+        route.navigate(['setup']);
+      }
+    });
   }
 
   ngOnInit() {

@@ -1,3 +1,4 @@
+import { bufferCount } from 'rxjs/internal/operators';
 import { Observable } from 'rxjs';
 import { Injectable } from '@angular/core';
 import { AuthenticationService } from './authentication.service';
@@ -16,68 +17,83 @@ export class CryptoService {
   private salt: ArrayBuffer;
   private enc = new TextEncoder();
 
-  private masterPassword = 'akane9120';
+  private masterPassword = null;
 
   private _master: CryptoKey = null;
   private _wrapper: CryptoKey = null;
   private _unwrapped: CryptoKey = null;
 
+  public ready: Promise<boolean> = undefined;
+
   constructor(private auth: AuthenticationService) {
     const open = indexedDB.open('Vault', 1);
-    open.onupgradeneeded = e => {
-      this.db = open.result;
-      const store = this.db.createObjectStore('Keys');
-    };
 
-    open.onsuccess = e => {
-      this.db = open.result;
-    };
+    this.ready = new Promise((resolve, reject) => {
+      auth.user.subscribe(user => {
+        if (user) {
+          this.salt = this.enc.encode(this.auth.details.uid).slice(0, 16);
 
-    auth.user.subscribe(user => {
-      if (user) {
-        this.salt = this.enc.encode(this.auth.details.uid).slice(0, 16);
-      }
-    });
-
-    if (this.masterPassword) {
-      this.GetKey().then(unwrapped => {
-        this._unwrapped = unwrapped;
+          if (this.masterPassword) {
+            this.GetKey().then(unwrapped => {
+              this._unwrapped = unwrapped;
+            });
+          }
+        }
       });
-    }
+
+      open.onupgradeneeded = e => {
+        this.db = open.result;
+        const store = this.db.createObjectStore('Keys');
+      };
+
+      open.onsuccess = e => {
+        this.db = open.result;
+        resolve(typeof(this.masterPassword) === 'string' && this.masterPassword !== '');
+      };
+
+      open.onerror = e => {
+        reject(e);
+      };
+    });
   }
 
-  private Add(type: string, key: any): Observable<Event> {
-    return Observable.create((observer) => {
+  private Add(type: string, key: any): Promise<Event> {
+    return new Promise((resolve, reject) => {
       const store = this.db.transaction(['Keys'], 'readwrite').objectStore('Keys');
-      const request = store.add(key, type);
+      const request = store.put(key, type);
       request.onsuccess = e => {
-        observer.next(e);
-        observer.complete();
+        resolve(e);
       };
       request.onerror = e => {
-        observer.error(e);
+        reject(e);
       };
     });
   }
 
-  private Get<T>(key: string): Observable<T> {
-    return Observable.create((observer) => {
+  private Get<T>(key: string): Promise<T> {
+    return new Promise((resolve, reject) => {
       const store = this.db.transaction(['Keys'], 'readonly').objectStore('Keys');
       const request = store.get(key);
       request.onsuccess = e => {
-        observer.next(request.result);
-        observer.complete();
+        resolve(request.result);
       };
       request.onerror = e => {
-        observer.error(e);
+        reject(e);
       };
     });
   }
+  public Encrypt(input: ArrayBuffer | string): PromiseLike<Encrypted> {
+    let buffer: ArrayBuffer;
 
-  public Encrypt(data: ArrayBuffer): PromiseLike<Encrypted> {
+    if (input instanceof ArrayBuffer) {
+      buffer = input;
+    } else if (typeof(input) === 'string') {
+      buffer = this.enc.encode(input);
+    }
+
     const iv = window.crypto.getRandomValues(new Uint8Array(16));
     const algorithm: any = { name: 'AES-CBC', iv: iv};
-    return subtle.encrypt(algorithm, this._unwrapped, data).then(result => {
+    return subtle.encrypt(algorithm, this._unwrapped, buffer).then(result => {
       return {
         Data: result,
         IV: iv
@@ -86,6 +102,10 @@ export class CryptoService {
   }
 
   public Decrypt(raw: Encrypted): PromiseLike<ArrayBuffer> {
+    if (raw === undefined || raw === null) {
+      return null;
+    }
+
     const algorithm: any = { name: 'AES-CBC', iv: raw.IV};
     return subtle.decrypt(algorithm, this._unwrapped, raw.Data);
   }
@@ -114,36 +134,67 @@ export class CryptoService {
 
     const privateKey = await p;
     const iv = await i;
+
+    if (!privateKey || !iv) {
+      return null;
+    }
+
     const buffer = this.enc.encode(this.masterPassword);
     return this.MasterKey(buffer).then(wrapper => {
-      return this.Unwrap(<any>privateKey, wrapper, <any>iv);
+      return this.Unwrap(privateKey, wrapper, iv);
     });
   }
 
-  public GenerateKey(master: ArrayBuffer) {
+  public SetMaster(master: string): Promise<boolean> {
+    this.masterPassword = master;
 
-    const generate = subtle.generateKey({ name: 'AES-CBC', length: 256}, true, ['encrypt', 'decrypt']);
-
-    this.MasterKey(master).then(async wrapper =>  {
-      console.log(wrapper);
-
-      const key = await generate;
-      console.log(key);
-
-      subtle.exportKey('jwk', key).then(result => {
-        const blob = new Blob([JSON.stringify(result)], { type: 'application/json' });
-        const url = window.URL.createObjectURL(blob);
-        window.open(url);
+    return this.ready = new Promise((resolve, reject) => {
+      this.GetKey().then(unwrapped => {
+        this._unwrapped = unwrapped;
+        resolve(true);
       });
+    });
+  }
 
-      const iv = window.crypto.getRandomValues(new Uint8Array(16));
-      const algorithm: any = { name: 'AES-CBC', iv: iv};
-      this.Add('IV', iv);
+  public async HasKeys(): Promise<boolean> {
+    const p = this.Get<ArrayBuffer>('Private');
+    const i = this.Get<ArrayBuffer>('IV');
 
-      return subtle.wrapKey('raw', key, wrapper, algorithm);
-    }).then(wrapped => {
-      console.log(wrapped);
-      this.Add('Private', new Uint8Array(wrapped));
+    const privateKey = await p;
+    const iv = await i;
+
+    if (!privateKey || !iv) {
+      return false;
+    }
+
+    return true;
+  }
+
+  public GenerateKey(master: ArrayBuffer): Promise<boolean> {
+    return this.ready = new Promise((resolve, reject) => {
+      subtle.generateKey({ name: 'AES-CBC', length: 256}, true, ['encrypt', 'decrypt']).then(key => {
+        console.log(key);
+
+        this.MasterKey(master).then(wrapper =>  {
+          console.log(wrapper);
+
+          subtle.exportKey('jwk', key).then(result => {
+            const blob = new Blob([JSON.stringify(result)], { type: 'application/json' });
+            const url = window.URL.createObjectURL(blob);
+            window.open(url);
+          });
+
+          const iv = window.crypto.getRandomValues(new Uint8Array(16));
+          const algorithm: any = { name: 'AES-CBC', iv: iv};
+          this.Add('IV', iv);
+
+          return subtle.wrapKey('raw', key, wrapper, algorithm);
+        }).then(wrapped => {
+          console.log(wrapped);
+          this.Add('Private', new Uint8Array(wrapped));
+          resolve(true);
+        });
+      });
     });
   }
 }
