@@ -14,4 +14,8 @@ export class StoreService {
   public Get<T>(collection: string): AngularFirestoreCollection<T> {
     return this.fireStore.collection<T>(collection);
   }
+
+  public Save<T>(collection: string, key: string, item: T): Promise<void> {
+    return this.Get<T>(collection).doc(key).set(item);
+  }
 }

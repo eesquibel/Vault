@@ -9,12 +9,8 @@ import { CryptoService } from '../service/crypto.service';
 })
 export class CredentialComponent implements OnInit {
 
-  constructor(private crypto: CryptoService, private route: Router) {
-    crypto.ready.then(ready => {
-      if (ready === false) {
-        route.navigate(['setup']);
-      }
-    });
+  constructor() {
+
   }
 
   ngOnInit() {

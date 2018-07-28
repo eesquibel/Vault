@@ -1,4 +1,4 @@
 export interface Encrypted {
-  Data: ArrayBuffer;
+  Data: Uint8Array;
   IV: Uint8Array;
 }

@@ -95,7 +95,7 @@ export class CryptoService {
     const algorithm: any = { name: 'AES-CBC', iv: iv};
     return subtle.encrypt(algorithm, this._unwrapped, buffer).then(result => {
       return {
-        Data: result,
+        Data: new Uint8Array(result),
         IV: iv
       };
     });

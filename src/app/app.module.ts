@@ -1,26 +1,36 @@
-import { BrowserModule } from '@angular/platform-browser';
 import { NgModule } from '@angular/core';
+import { FormsModule, ReactiveFormsModule } from '@angular/forms';
+import { BrowserModule } from '@angular/platform-browser';
 import { RouterModule, Routes } from '@angular/router';
-import { FormsModule } from '@angular/forms';
-
 import { AngularFireModule } from 'angularfire2';
 import { AngularFireAuthModule } from 'angularfire2/auth';
 import { AngularFirestoreModule } from 'angularfire2/firestore';
 
 import { environment } from '../environments/environment';
 import { AppComponent } from './app.component';
-import { LoginComponent } from './login/login.component';
-import { ListComponent } from './credential/list/list.component';
 import { CredentialComponent } from './credential/credential.component';
+import { ListItemComponent } from './credential/list/item/item.component';
+import { ListComponent } from './credential/list/list.component';
+import { LoginComponent } from './login/login.component';
 import { SetupComponent } from './setup/setup.component';
+import { SecretComponent } from './credential/list/secret/secret.component';
+import { LoginGuard } from './login.guard';
+import { AddComponent } from './credential/add/add.component';
 
 const appRoutes: Routes = [
   { path: 'login', component: LoginComponent },
   { path: 'setup', component: SetupComponent },
-  { path: 'credential', component: CredentialComponent, children: [
-    { path: '', component: ListComponent }
-  ]},
-  { path: '**', redirectTo: 'credential' }
+  {
+    path: 'credential',
+    component: CredentialComponent,
+    canActivate: [LoginGuard],
+    canActivateChild: [LoginGuard],
+    children: [
+      { path: '', component: ListComponent },
+      { path: 'add', component: AddComponent }
+    ]
+  },
+  { path: '', component : AppComponent}
 ];
 
 @NgModule({
@@ -29,19 +39,25 @@ const appRoutes: Routes = [
     LoginComponent,
     ListComponent,
     CredentialComponent,
-    SetupComponent
+    SetupComponent,
+    ListItemComponent,
+    SecretComponent,
+    AddComponent
   ],
   imports: [
     BrowserModule,
     RouterModule.forRoot(
-      appRoutes
+      appRoutes, {
+        onSameUrlNavigation: 'reload'
+      }
     ),
     AngularFireModule.initializeApp(environment.firebase),
     AngularFireAuthModule,
     AngularFirestoreModule.enablePersistence(),
-    FormsModule
+    FormsModule,
+    ReactiveFormsModule
   ],
-  providers: [],
+  providers: [LoginGuard],
   bootstrap: [AppComponent]
 })
 export class AppModule { }

@@ -1,2 +1,3 @@
 <button type="button" class="btn btn-primary" *ngIf="! auth.isLoggedIn" (click)="auth.signin()">Login</button>
 <button type="button" class="btn btn-light" *ngIf="auth.isLoggedIn" (click)="auth.signout()">Logout</button>
+<button type="button" class="btn btn-light" (click)="reload()"><span class="oi oi-reload"></span></button>
