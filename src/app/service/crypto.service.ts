@@ -1,9 +1,7 @@
-import { bufferCount } from 'rxjs/internal/operators';
-import { Observable } from 'rxjs';
 import { Injectable } from '@angular/core';
-import { AuthenticationService } from './authentication.service';
-import { wrappedError } from '@angular/core/src/error_handler';
+
 import { Encrypted } from '../model/encrypted';
+import { AuthenticationService } from './authentication.service';
 
 const subtle: SubtleCrypto = window.crypto.subtle;
 const TextEncoder = window['TextEncoder'];
@@ -111,7 +109,7 @@ export class CryptoService {
   }
 
   private MasterKey(master: ArrayBuffer): PromiseLike<CryptoKey> {
-    return subtle.importKey('raw', master, {name: 'PBKDF2'}, false, ['deriveBits', 'deriveKey']).then(masterKey => {
+    return subtle.importKey('raw', master, {name: 'PBKDF2', length: 256}, false, ['deriveBits', 'deriveKey']).then(masterKey => {
       console.log(masterKey);
       return subtle.deriveKey(
         { name: 'PBKDF2', hash: 'SHA-256', salt: this.salt, iterations: 128 },
@@ -123,7 +121,7 @@ export class CryptoService {
     });
   }
 
-  private Unwrap(key: BufferSource, wrapper: CryptoKey, iv: ArrayBuffer): PromiseLike<CryptoKey> {
+  private Unwrap(key: ArrayBuffer, wrapper: CryptoKey, iv: ArrayBuffer): PromiseLike<CryptoKey> {
     const algorithm: any = { name: 'AES-CBC', iv: iv};
     return subtle.unwrapKey('raw', key, wrapper, algorithm, { name: 'AES-CBC' }, false, ['encrypt', 'decrypt']);
   }
@@ -197,4 +195,5 @@ export class CryptoService {
       });
     });
   }
+
 }

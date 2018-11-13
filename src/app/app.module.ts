@@ -2,21 +2,21 @@ import { NgModule } from '@angular/core';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { BrowserModule } from '@angular/platform-browser';
 import { RouterModule, Routes } from '@angular/router';
+import { ServiceWorkerModule } from '@angular/service-worker';
 import { AngularFireModule } from 'angularfire2';
 import { AngularFireAuthModule } from 'angularfire2/auth';
 import { AngularFirestoreModule } from 'angularfire2/firestore';
 
 import { environment } from '../environments/environment';
 import { AppComponent } from './app.component';
+import { AddComponent } from './credential/add/add.component';
 import { CredentialComponent } from './credential/credential.component';
 import { ListItemComponent } from './credential/list/item/item.component';
 import { ListComponent } from './credential/list/list.component';
-import { LoginComponent } from './login/login.component';
-import { ServiceWorkerModule } from '@angular/service-worker';
-import { SetupComponent } from './setup/setup.component';
 import { SecretComponent } from './credential/list/secret/secret.component';
 import { LoginGuard } from './login.guard';
-import { AddComponent } from './credential/add/add.component';
+import { LoginComponent } from './login/login.component';
+import { SetupComponent } from './setup/setup.component';
 
 const appRoutes: Routes = [
   { path: 'login', component: LoginComponent },
@@ -62,4 +62,5 @@ const appRoutes: Routes = [
   providers: [LoginGuard],
   bootstrap: [AppComponent]
 })
-export class AppModule { }
+export class AppModule {
+}

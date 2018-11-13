@@ -1,6 +1,5 @@
-import { Component, OnInit, AfterViewInit } from '@angular/core';
+import { AfterViewInit, Component, OnInit } from '@angular/core';
 import { AngularFirestoreCollection } from 'angularfire2/firestore';
-import { Observable } from 'rxjs';
 import { map } from 'rxjs/operators';
 
 import { Credential } from '../../model/credential';
@@ -20,7 +19,6 @@ export class ListComponent implements OnInit, AfterViewInit {
   public List: Credential[];
 
   constructor(private auth: AuthenticationService, private store: StoreService, private crypto: CryptoService) {
-
   }
 
   ngOnInit() {

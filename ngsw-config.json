@@ -2,7 +2,7 @@
   "index": "/index.html",
   "assetGroups": [
     {
-      "name": "app",
+      "name": "Vault",
       "installMode": "prefetch",
       "resources": {
         "files": [

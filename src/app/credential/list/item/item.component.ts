@@ -1,8 +1,9 @@
-import { AngularFirestoreCollection, AngularFirestoreDocument } from 'angularfire2/firestore';
-import { StoreService } from './../../../service/store.service';
-import { Credential } from './../../../model/credential';
-import { Component, OnInit, Input } from '@angular/core';
+import { Component, Input, OnInit } from '@angular/core';
 import { FormGroup } from '@angular/forms';
+import { AngularFirestoreDocument } from 'angularfire2/firestore';
+
+import { Credential } from './../../../model/credential';
+import { StoreService } from './../../../service/store.service';
 
 @Component({
   selector: 'app-list-item',
@@ -17,12 +18,11 @@ export class ListItemComponent implements OnInit {
   @Input('doc')
   protected doc: AngularFirestoreDocument<Credential>;
 
-  protected mode: 'blank' | 'view' | 'edit';
+  public mode: 'blank' | 'view' | 'edit';
 
   public form: FormGroup;
 
   constructor(private store: StoreService) {
-
   }
 
   ngOnInit() {

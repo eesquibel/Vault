@@ -1,11 +1,11 @@
 export const environment = {
-  production: false,
+  production: true,
   firebase: {
-    apiKey: null,
-    authDomain: null,
-    databaseURL: null,
-    projectId: null,
-    storageBucket: null,
-    messagingSenderId: null
+    apiKey: 'AIzaSyAVuEajZX7xdFogqyTv_q43U8If_VNx3b0',
+    authDomain: 'vault-368be.firebaseapp.com',
+    databaseURL: 'https://vault-368be.firebaseio.com',
+    projectId: 'vault-368be',
+    storageBucket: 'vault-368be.appspot.com',
+    messagingSenderId: '283512373758'
   }
 };

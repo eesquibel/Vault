@@ -19,7 +19,8 @@ export class SetupComponent implements OnInit {
   public hasKeys = true;
   public loggedIn = false;
 
-  constructor(private route: Router, private crypto: CryptoService, private auth: AuthenticationService) { }
+  constructor(private route: Router, private crypto: CryptoService, private auth: AuthenticationService) {
+  }
 
   async ngOnInit() {
     this.crypto.ready.then(async ready => {

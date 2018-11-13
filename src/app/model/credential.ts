@@ -1,7 +1,7 @@
-import { Encrypted } from './encrypted';
+import { FormControl } from '@angular/forms';
+
 import { CryptoService } from '../service/crypto.service';
-import { FormControl, Validators } from '@angular/forms';
-import { DocumentData } from 'angularfire2/firestore';
+import { Encrypted } from './encrypted';
 
 export class Credential {
   public Domain: string = null;
@@ -96,4 +96,5 @@ export class Credential {
       };
     }
   }
+
 }

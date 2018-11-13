@@ -1,24 +1,22 @@
+import { NgTemplateOutlet } from '@angular/common';
 import {
   AfterViewInit,
+  ChangeDetectorRef,
   Component,
   ElementRef,
   forwardRef,
   HostListener,
   Input,
   OnInit,
-  Renderer2,
-  ViewChild,
-  TemplateRef,
-  ViewRef,
-  ViewContainerRef,
-  ChangeDetectorRef,
   SimpleChange,
+  TemplateRef,
+  ViewChild,
+  ViewRef,
 } from '@angular/core';
 import { ControlValueAccessor, NG_VALUE_ACCESSOR } from '@angular/forms';
 
 import { Encrypted } from '../../../model/encrypted';
 import { CryptoService } from '../../../service/crypto.service';
-import { NgTemplateOutlet } from '@angular/common';
 
 @Component({
   selector: 'app-secret',
@@ -52,7 +50,7 @@ export class SecretComponent implements OnInit, AfterViewInit, ControlValueAcces
   @ViewChild('edit')
   protected edit: TemplateRef<ViewRef>;
 
-  protected get template(): TemplateRef<ViewRef> {
+  public get template(): TemplateRef<ViewRef> {
     return this[this.mode];
   }
 
@@ -158,4 +156,5 @@ export class SecretComponent implements OnInit, AfterViewInit, ControlValueAcces
       console.warn(e);
     });
   }
+
 }
