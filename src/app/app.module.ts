@@ -20,6 +20,7 @@ import { SetupComponent } from './setup/setup.component';
 
 const appRoutes: Routes = [
   { path: 'login', component: LoginComponent },
+  { path: 'login/redirect', component: LoginComponent, data: { redirect: true } },
   { path: 'setup', component: SetupComponent },
   {
     path: 'credential',

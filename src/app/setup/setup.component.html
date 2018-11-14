@@ -23,4 +23,11 @@
       </div>
     </div>
   </div>
+  <div class="form-group mb-3" *ngIf="hasKeys === false">
+    <label for="">Upload Master Key</label>
+    <div class="input-group">
+      <input type="file" class="form-control" name="key" #file (change)="onFileChange($event)">
+      <div class="input-group-append"></div>
+    </div>
+  </div>
 </ng-template>

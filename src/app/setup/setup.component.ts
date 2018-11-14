@@ -16,8 +16,13 @@ export class SetupComponent implements OnInit {
   @ViewChild('masterPassword')
   public masterPassword: ElementRef;
 
+  @ViewChild('file')
+  public file: ElementRef;
+
   public hasKeys = true;
   public loggedIn = false;
+
+  private Key: JsonWebKey;
 
   constructor(private route: Router, private crypto: CryptoService, private auth: AuthenticationService) {
   }
@@ -43,9 +48,41 @@ export class SetupComponent implements OnInit {
   }
 
   public Login() {
-    this.crypto.SetMaster(this.masterPassword.nativeElement.value).then(() => {
-      this.route.navigate(['credential']);
-    });
+    if (this.Key) {
+      const enc = new TextEncoder();
+      const password = this.masterPassword.nativeElement.value;
+      const masterBytes = enc.encode(password);
+      this.crypto.ImportKey(masterBytes, this.Key).then(() => {
+        this.route.navigate(['credential']);
+      });
+    } else {
+      this.crypto.SetMaster(this.masterPassword.nativeElement.value).then(() => {
+        this.route.navigate(['credential']);
+      });
+    }
+  }
+
+  public onFileChange(event: Event): void {
+    const upload: HTMLInputElement = this.file.nativeElement;
+    const files: Array<File> = Array.from(upload.files);
+
+    for (let file of files) {
+      let reader = new FileReader();
+
+      reader.onload = e => {
+        const result = <string>(<FileReader>e.target).result;
+
+        try {
+          this.hasKeys = true;
+          this.Key = JSON.parse(result);
+        } catch (e) {
+          this.hasKeys = false;
+          this.Key = null;
+        }
+      };
+
+      reader.readAsText(file);
+    }
   }
 
 }

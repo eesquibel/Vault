@@ -30,8 +30,8 @@ export class AuthenticationService {
     });
   }
 
-  public signin(): Promise<firebase.auth.UserCredential> {
-    return this.fireAuth.auth.signInWithPopup(new firebase.auth.GoogleAuthProvider());
+  public signin(): void {
+    this.fireAuth.auth.signInWithRedirect(new firebase.auth.GoogleAuthProvider());
   }
 
   public signout(): Promise<void> {

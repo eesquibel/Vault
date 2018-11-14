@@ -1,7 +1,7 @@
 import { Component, OnInit } from '@angular/core';
 
 import { AuthenticationService } from '../service/authentication.service';
-import { Router } from '@angular/router';
+import { Router, ActivatedRoute } from '@angular/router';
 
 @Component({
   selector: 'app-login',
@@ -10,10 +10,27 @@ import { Router } from '@angular/router';
 })
 export class LoginComponent implements OnInit {
 
-  constructor(public auth: AuthenticationService, protected router: Router) {
+  public redirect = false;
+
+  constructor(
+    public auth: AuthenticationService,
+    protected router: Router,
+    protected route: ActivatedRoute) {
   }
 
-  ngOnInit() {
+  public ngOnInit(): void {
+    this.route.data.subscribe(data => {
+      if ('redirect' in data && data.redirect)
+      {
+        this.redirect = true;
+
+        this.auth.user.subscribe(user => {
+          if (user == null) {
+            this.auth.signin();
+          }
+        });
+      }
+    });
   }
 
   public reload() {

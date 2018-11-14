@@ -109,7 +109,7 @@ export class CryptoService {
   }
 
   private MasterKey(master: ArrayBuffer): PromiseLike<CryptoKey> {
-    return subtle.importKey('raw', master, {name: 'PBKDF2', length: 256}, false, ['deriveBits', 'deriveKey']).then(masterKey => {
+    return subtle.importKey('raw', master, 'PBKDF2', false, ['deriveBits', 'deriveKey']).then(masterKey => {
       console.log(masterKey);
       return subtle.deriveKey(
         { name: 'PBKDF2', hash: 'SHA-256', salt: this.salt, iterations: 128 },
@@ -118,6 +118,9 @@ export class CryptoService {
         false,
         ['wrapKey', 'unwrapKey']
       );
+    }, e => {
+      console.error(e);
+      return null;
     });
   }
 
@@ -140,6 +143,9 @@ export class CryptoService {
     const buffer = this.enc.encode(this.masterPassword);
     return this.MasterKey(buffer).then(wrapper => {
       return this.Unwrap(privateKey, wrapper, iv);
+    }, e => {
+      console.error(e);
+      return null;
     });
   }
 
@@ -150,6 +156,9 @@ export class CryptoService {
       this.GetKey().then(unwrapped => {
         this._unwrapped = unwrapped;
         resolve(true);
+      }, e => {
+        console.error(e);
+        reject(e);
       });
     });
   }
@@ -166,6 +175,35 @@ export class CryptoService {
     }
 
     return true;
+  }
+
+  public ImportKey(master: ArrayBuffer, key: JsonWebKey): Promise<boolean> {
+    return this.ready = new Promise((resolve, reject) => {
+      subtle.importKey('jwk', key, { name: 'AES-CBC', length: 256}, true, ['encrypt', 'decrypt']).then(key => {
+        console.log(key);
+
+        this.MasterKey(master).then(wrapper =>  {
+          console.log(wrapper);
+
+          const iv = window.crypto.getRandomValues(new Uint8Array(16));
+          const algorithm: any = { name: 'AES-CBC', iv: iv};
+          this.Add('IV', iv);
+
+          return subtle.wrapKey('raw', key, wrapper, algorithm);
+        }, e => {
+          console.error(e);
+          reject(e);
+          return null;
+        }).then(wrapped => {
+          console.log(wrapped);
+          this.Add('Private', new Uint8Array(wrapped));
+          resolve(true);
+        }, e => {
+          console.error(e);
+          reject(e);
+        });
+      });
+    });
   }
 
   public GenerateKey(master: ArrayBuffer): Promise<boolean> {
@@ -187,10 +225,17 @@ export class CryptoService {
           this.Add('IV', iv);
 
           return subtle.wrapKey('raw', key, wrapper, algorithm);
+        }, e => {
+          console.error(e);
+          reject(e);
+          return null;
         }).then(wrapped => {
           console.log(wrapped);
           this.Add('Private', new Uint8Array(wrapped));
           resolve(true);
+        }, e => {
+          console.error(e);
+          reject(e);
         });
       });
     });
