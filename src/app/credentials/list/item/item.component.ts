@@ -26,6 +26,7 @@ export class CredentialsListItemComponent implements OnInit {
   }
 
   ngOnInit() {
+    console.log(this.credential);
     this.form = new FormGroup(this.Controls());
     this.mode = 'blank';
   }
@@ -42,10 +43,12 @@ export class CredentialsListItemComponent implements OnInit {
     return controls;
   }
 
-
   protected Save() {
     this.credential.Data = this.form.value;
-    this.doc.set(this.credential.Save()).then(_ => {
+
+    this.credential.Save().then(raw => {
+      return this.doc.set(raw);
+    }).then(() => {
       this.form.reset(this.credential.Data);
       this.mode = 'blank';
     });
