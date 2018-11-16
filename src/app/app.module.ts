@@ -9,11 +9,11 @@ import { AngularFirestoreModule } from 'angularfire2/firestore';
 
 import { environment } from '../environments/environment';
 import { AppComponent } from './app.component';
-import { AddComponent } from './credential/add/add.component';
-import { CredentialComponent } from './credential/credential.component';
-import { ListItemComponent } from './credential/list/item/item.component';
-import { ListComponent } from './credential/list/list.component';
-import { SecretComponent } from './credential/list/secret/secret.component';
+import { AddComponent } from './credentials/add/add.component';
+import { CredentialsComponent } from './credentials/credentials.component';
+import { CredentialsListItemComponent } from './credentials/list/item/item.component';
+import { CredentialsListComponent } from './credentials/list/list.component';
+import { SecretComponent } from './credentials/list/secret/secret.component';
 import { LoginGuard } from './login.guard';
 import { LoginComponent } from './login/login.component';
 import { SetupComponent } from './setup/setup.component';
@@ -24,11 +24,11 @@ const appRoutes: Routes = [
   { path: 'setup', component: SetupComponent },
   {
     path: 'credential',
-    component: CredentialComponent,
+    component: CredentialsComponent,
     canActivate: [LoginGuard],
     canActivateChild: [LoginGuard],
     children: [
-      { path: '', component: ListComponent },
+      { path: '', component: CredentialsListComponent },
       { path: 'add', component: AddComponent }
     ]
   },
@@ -39,10 +39,10 @@ const appRoutes: Routes = [
   declarations: [
     AppComponent,
     LoginComponent,
-    ListComponent,
-    CredentialComponent,
+    CredentialsListComponent,
+    CredentialsComponent,
     SetupComponent,
-    ListItemComponent,
+    CredentialsListItemComponent,
     SecretComponent,
     AddComponent
   ],

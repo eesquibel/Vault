@@ -1,16 +1,16 @@
 import { Component, Input, OnInit } from '@angular/core';
-import { FormGroup } from '@angular/forms';
+import { FormGroup, FormControl } from '@angular/forms';
 import { AngularFirestoreDocument } from 'angularfire2/firestore';
 
 import { Credential } from './../../../model/credential';
 import { StoreService } from './../../../service/store.service';
 
 @Component({
-  selector: 'app-list-item',
+  selector: 'app-credentials-list-item',
   templateUrl: './item.component.html',
   styleUrls: ['./item.component.css']
 })
-export class ListItemComponent implements OnInit {
+export class CredentialsListItemComponent implements OnInit {
 
   @Input('credential')
   public credential: Credential;
@@ -26,9 +26,22 @@ export class ListItemComponent implements OnInit {
   }
 
   ngOnInit() {
-    this.form = new FormGroup(this.credential.Controls);
+    this.form = new FormGroup(this.Controls());
     this.mode = 'blank';
   }
+
+  private Controls(): {[key: string]: FormControl} {
+    const controls = {};
+
+    for (const key in this.credential.Data) {
+      if (this.credential.Data.hasOwnProperty(key)) {
+        controls[key] = new FormControl(this.credential.Data[key], []);
+      }
+    }
+
+    return controls;
+  }
+
 
   protected Save() {
     this.credential.Data = this.form.value;

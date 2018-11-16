@@ -8,11 +8,11 @@ import { AuthenticationService } from './../../service/authentication.service';
 import { CryptoService } from './../../service/crypto.service';
 
 @Component({
-  selector: 'app-list',
+  selector: 'app-credentials-list',
   templateUrl: './list.component.html',
   styleUrls: ['./list.component.css']
 })
-export class ListComponent implements OnInit, AfterViewInit {
+export class CredentialsListComponent implements OnInit, AfterViewInit {
 
   protected list: AngularFirestoreCollection<Credential>;
 

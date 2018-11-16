@@ -1,5 +1,3 @@
-import { FormControl } from '@angular/forms';
-
 import { CryptoService } from '../service/crypto.service';
 import { Encrypted } from './encrypted';
 
@@ -10,7 +8,6 @@ export class Credential {
   public Data: {[key: string]: Encrypted} = null;
 
   private _reader: {[key: string]: any} = undefined;
-  private _controls: {[key: string]: FormControl} = undefined;
 
   public get Reader(): {[key: string]: any} {
     if (this._reader === undefined) {
@@ -26,19 +23,6 @@ export class Credential {
     }
 
     return this._reader;
-  }
-
-  public get Controls(): {[key: string]: FormControl} {
-    if (this._controls === undefined) {
-      this._controls = { };
-      for (const key in this.Data) {
-        if (this.Data.hasOwnProperty(key)) {
-          this._controls[key] = new FormControl(this.Data[key], []);
-        }
-      }
-    }
-
-    return this._controls;
   }
 
   public Save(): Credential {
