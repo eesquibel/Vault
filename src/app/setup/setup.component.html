@@ -16,18 +16,31 @@
   <div class="form-group mb-3">
     <label for="file-private">Master Password</label>
     <div class="input-group">
-        <input type="password" class="form-control" name="master" #masterPassword>
+        <input type="password" class="form-control" name="master" autocomplete="new-password" #masterPassword>
         <div class="input-group-append">
           <button type="submit" class="btn btn-primary" *ngIf="hasKeys === true" (click)="Login()">Login</button>
           <button type="submit" class="btn btn-primary" *ngIf="hasKeys === false" (click)="Generate()">Generate Key</button>
       </div>
     </div>
   </div>
-  <div class="form-group mb-3" *ngIf="hasKeys === false">
+  <ng-container [ngTemplateOutlet]="existingKeyTemplate"></ng-container>
+</ng-template>
+
+<ng-template #upload>
+  <div class="form-group mb-3">
     <label for="">Upload Master Key</label>
     <div class="input-group">
       <input type="file" class="form-control" name="key" #file (change)="onFileChange($event)">
       <div class="input-group-append"></div>
+    </div>
+  </div>
+</ng-template>
+
+<ng-template #key>
+  <div class="form-group mb-3">
+    <label for="">Master Key</label>
+    <div class="input-group">
+        <input type="text" readonly class="form-control-plaintext" [value]="KeyJson">
     </div>
   </div>
 </ng-template>

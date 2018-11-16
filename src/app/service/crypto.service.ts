@@ -182,6 +182,8 @@ export class CryptoService {
       subtle.importKey('jwk', key, { name: 'AES-CBC', length: 256}, true, ['encrypt', 'decrypt']).then(key => {
         console.log(key);
 
+        this._unwrapped = key;
+
         this.MasterKey(master).then(wrapper =>  {
           console.log(wrapper);
 

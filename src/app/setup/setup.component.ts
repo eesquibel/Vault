@@ -1,8 +1,9 @@
-import { Component, ElementRef, OnInit, ViewChild } from '@angular/core';
+import { Component, ElementRef, OnInit, ViewChild, TemplateRef, ContentChild } from '@angular/core';
 import { Router } from '@angular/router';
 
 import { AuthenticationService } from '../service/authentication.service';
 import { CryptoService } from './../service/crypto.service';
+import { Template } from '@angular/compiler/src/render3/r3_ast';
 
 const TextEncoder = window['TextEncoder'];
 
@@ -19,12 +20,43 @@ export class SetupComponent implements OnInit {
   @ViewChild('file')
   public file: ElementRef;
 
+  @ViewChild('upload')
+  public upload: TemplateRef<any>;
+
+  @ViewChild('key')
+  public keyTpl: TemplateRef<any>;
+
+  public get existingKeyTemplate(): TemplateRef<any> {
+    if (this.hasKeys && this.Key) {
+      return this.keyTpl;
+    } else if (this.hasKeys) {
+      return null;
+    } else {
+      return this.upload;
+    }
+  }
+
+  public get KeyJson(): string {
+    if (this.Key) {
+      const key = Object.assign({}, this.Key);
+
+      if (key && 'k' in key) {
+        key.k = key.k.substr(0, 8) + '********';
+      }
+
+      return JSON.stringify(key);
+    }
+  }
+
   public hasKeys = true;
   public loggedIn = false;
 
   private Key: JsonWebKey;
 
-  constructor(private route: Router, private crypto: CryptoService, private auth: AuthenticationService) {
+  constructor(
+    private route: Router,
+    private crypto: CryptoService,
+    private auth: AuthenticationService) {
   }
 
   async ngOnInit() {
