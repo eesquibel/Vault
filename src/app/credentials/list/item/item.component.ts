@@ -1,9 +1,12 @@
-import { Component, Input, OnInit } from '@angular/core';
+import { Component, Input, OnInit, TemplateRef } from '@angular/core';
 import { FormGroup, FormControl } from '@angular/forms';
 import { AngularFirestoreDocument } from 'angularfire2/firestore';
 
 import { Credential } from './../../../model/credential';
 import { StoreService } from './../../../service/store.service';
+import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
+
+type modes = 'blank' | 'view' | 'edit';
 
 @Component({
   selector: 'app-credentials-list-item',
@@ -18,11 +21,11 @@ export class CredentialsListItemComponent implements OnInit {
   @Input('doc')
   protected doc: AngularFirestoreDocument<Credential>;
 
-  public mode: 'blank' | 'view' | 'edit';
+  public mode: modes;
 
   public form: FormGroup;
 
-  constructor(private store: StoreService) {
+  constructor(private store: StoreService, private modal: NgbModal) {
   }
 
   ngOnInit() {
@@ -30,6 +33,12 @@ export class CredentialsListItemComponent implements OnInit {
     this.form = new FormGroup(this.Controls());
     this.mode = 'blank';
   }
+
+  public open(mode: modes, content: TemplateRef<any>) {
+    this.mode = mode;
+    this.modal.open(content);
+  }
+
 
   private Controls(): {[key: string]: FormControl} {
     const controls = {};
